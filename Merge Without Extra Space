@@ -1,27 +1,71 @@
- public static void merge(long arr1[], long arr2[], int n, int m) 
-    {
-        
-        
-        for(int i = 0; i<n ; i++){
+public static void merge(long arr1[], long arr2[], int n, int m) {
+    // Iterate over each element in arr1
+    for(int i = 0; i < n; i++) {
+        // Check if the current element in arr1 is greater than the first element in arr2
+        if(arr1[i] > arr2[0]) {
+            // If so, swap arr1[i] with arr2[0] (to ensure arr1[i] stays smaller)
+            long temp = arr1[i];
+            arr1[i] = arr2[0];
+            arr2[0] = temp;
+
+            // Now, arr2[0] may not be in the correct sorted position, so we need to sort arr2
+            // The swapped element (arr2[0]) is out of place, so we need to push it to its correct position.
             
-            if(arr1[i] > arr2[0]){
-                
-                long temp = arr1[i];
-                arr1[i] = arr2[0];
-                arr2[0] = temp;
-                
-                
-            long  f = arr2[0];            
-            int j ;
-            for(j = 1; j<m && arr2[j]<f ; j++){
-                
-                arr2[j-1] = arr2[j];
+            long f = arr2[0];  // Store the first element of arr2 (which needs to be repositioned)
+            int j;
+            
+            // Shift all elements in arr2 that are smaller than `f` to the left by one position
+            for(j = 1; j < m && arr2[j] < f; j++) {
+                arr2[j - 1] = arr2[j];
             }
-            
-            arr2[j-1] = f;    
-            
-            }
-            
-            
+
+            // Place `f` at its correct position (where `j-1` is the right spot for it)
+            arr2[j - 1] = f;
         }
     }
+}
+//The issue with the code lies in how the elements of arr2 are sorted after swapping an element with arr1. 
+Specifically, after swapping, the code manually shifts the smallest element (arr2[0]) into the correct position, 
+but this method can be inefficient and may lead to incorrect behavior in some edge cases, especially when arr2 is large. 
+Let's go through the code step by step with comments to explain how it works and where the problem lies.
+
+
+class Solution {
+    // Function to merge two sorted arrays without using extra space
+    public static void merge(long arr1[], long arr2[], int n, int m) {
+        // Find the minimum size between the two arrays. This ensures we only iterate
+        // through the smaller portion of elements that need to be compared and swapped.
+        int min = Math.min(n, m);
+        
+        // Initialize pointers: 
+        // 'i' starts at the beginning of arr2
+        // 't' starts at the end of arr1
+        int i = 0; 
+        int t = n - 1;
+        
+        // Loop through the arrays to swap elements between arr1 and arr2
+        while (i < min) {
+            // If the current element in arr1 (from the end) is greater than 
+            // the current element in arr2 (from the start), we swap them.
+            if (arr1[t] > arr2[i]) {
+                // Swap the elements
+                long temp = arr1[t];
+                arr1[t] = arr2[i];
+                arr2[i] = temp;
+            } else {
+                // If arr1[t] is already smaller or equal to arr2[i],
+                // stop swapping as arrays are in order at this point
+                break;
+            }
+            // Move pointers towards the center:
+            // 't' moves backward in arr1 and 'i' moves forward in arr2
+            t--;
+            i++;
+        }
+
+        // At this point, some elements may have been misplaced after swapping.
+        // So, we need to sort both arrays to restore their sorted order.
+        Arrays.sort(arr1); // Sort arr1 to restore its sorted order
+        Arrays.sort(arr2); // Sort arr2 to restore its sorted order
+    }
+}
